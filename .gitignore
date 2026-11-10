@@ -1,0 +1,6 @@
+GUIA_ESTUDIO_Y_EXPOSICION.md
+*.exe
+*.o
+*.out
+.vscode/
+
