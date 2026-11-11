@@ -37,6 +37,34 @@ const vector<vector<double>>& Graph::getMatrix() const {
     return adjMatrix;
 }
 
+const vector<Punto>& Graph::getCoordinates() const {
+    return coordinates;
+}
+
+bool Graph::validateGraph() const {
+    if (numNodes <= 1) return false;
+    if ((int)adjMatrix.size() != numNodes) return false;
+
+    for (int i = 0; i < numNodes; i++) {
+        if ((int)adjMatrix[i].size() != numNodes) return false;
+        if (abs(adjMatrix[i][i]) > 1e-6) return false;
+
+        for (int j = i + 1; j < numNodes; j++) {
+            if (adjMatrix[i][j] <= 0.0) return false;
+            if (abs(adjMatrix[i][j] - adjMatrix[j][i]) > 1e-6) return false;
+
+            for (int k = 0; k < numNodes; k++) {
+                if (k != i && k != j) {
+                    if (adjMatrix[i][j] > adjMatrix[i][k] + adjMatrix[k][j] + 0.05) {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
 Graph Graph::fromStructuredStream(istream& input, int maxNodes) {
     vector<Punto> nodos;
     string linea;
@@ -57,6 +85,7 @@ Graph Graph::fromStructuredStream(istream& input, int maxNodes) {
 
     int n = (int)nodos.size();
     Graph g(n);
+    g.coordinates = nodos;
 
     for (int i = 0; i < n; i++) {
         for (int j = i + 1; j < n; j++) {
@@ -78,15 +107,15 @@ Graph Graph::createPilotInstance(int n) {
     string datosSimulados =
         "# ID X Y\n"
         "0 50.0 50.0\n"
-        "1 20.0 80.0\n"
-        "2 85.0 75.0\n"
-        "3 15.0 25.0\n"
-        "4 65.0 15.0\n"
-        "5 90.0 40.0\n"
-        "6 35.0 60.0\n"
-        "7 70.0 85.0\n"
-        "8 10.0 55.0\n"
-        "9 45.0 20.0\n"
+        "1 42.0 68.0\n"
+        "2 62.0 65.0\n"
+        "3 25.0 82.0\n"
+        "4 78.0 80.0\n"
+        "5 85.0 45.0\n"
+        "6 72.0 20.0\n"
+        "7 48.0 28.0\n"
+        "8 22.0 22.0\n"
+        "9 18.0 52.0\n"
         "10 80.0 10.0\n"
         "11 25.0 95.0\n"
         "12 55.0 75.0\n"

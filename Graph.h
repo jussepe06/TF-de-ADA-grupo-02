@@ -16,6 +16,7 @@ struct Punto {
 class Graph {
 private:
     int numNodes;
+    vector<Punto> coordinates;
     vector<vector<double>> adjMatrix;
 
 public:
@@ -25,6 +26,9 @@ public:
     double getCost(int u, int v) const;
     int getNumNodes() const;
     const vector<vector<double>>& getMatrix() const;
+    const vector<Punto>& getCoordinates() const;
+
+    bool validateGraph() const;
 
     static Graph fromStructuredStream(istream& input, int maxNodes = -1);
     static Graph createPilotInstance(int n = 10);
