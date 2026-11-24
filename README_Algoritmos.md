@@ -1,28 +1,35 @@
-# RouteOpt - Avance 2 (Grupo 02)
+# RouteOpt — Sistema de Optimización de Rutas Logísticas (AndesExpress Logistics)
 
-Prototipo algorítmico en C++ para resolver el Problema del Viajante (TSP simétrico) aplicado al ruteo desde un almacén central (nodo 0) hacia $n$ clientes.
+Aplicación modular en **C++17** para resolver el Problema del Viajante Simétrico (**TSP**) sobre instancias geográficas reales (Haversine) y redes simuladas escalables, evaluando distancia física (km), costo operativo real (USD), tiempo de CPU, consumo de memoria y cantidad de estados/operaciones.
 
-## Cómo compilar y ejecutar
+## Compilación y Ejecución (MSYS2 / MinGW-w64)
 
 ```bash
-g++ -std=c++17 -Wall -Wextra Graph.cpp Algorithms.cpp main.cpp -o routeopt
-./routeopt
+g++ -std=c++17 -O2 -Wall -Wextra Graph.cpp Algorithms.cpp main.cpp -lpsapi -o routeopt.exe
+./routeopt.exe
 ```
 
-## Resumen de Complejidades
+Para ejecutar automáticamente toda la suite de benchmarking y generar las 4 gráficas del informe:
 
-Para un grafo completo de $N$ nodos representado con matriz de adyacencia:
+```bash
+./routeopt.exe --benchmark
+python generar_graficas.py
+```
 
-| Estructura / Algoritmo | Complejidad Temporal | Complejidad Espacial | Observaciones |
+## Complejidad Algorítmica y Límites Operativos
+
+| Estructura / Algoritmo | Complejidad Temporal | Complejidad Espacial | Garantía / Rango Recomendado |
 | :--- | :--- | :--- | :--- |
-| **Grafo (Matriz de Adyacencia)** | Inicialización: `O(N^2)` / Consulta: `O(1)` | `O(N^2)` | Guarda las distancias simétricas entre todos los nodos. |
-| **1. Backtracking (con poda)** | `O((N - 1)!)` $\approx$ `O(N!)` | `O(N)` | Exacto. Fija el nodo 0 como inicio y poda ramas cuando el costo acumulado ya supera al mejor costo encontrado. |
-| **2. Held-Karp (PD + Bitmask)** | `O(N^2 * 2^N)` | `O(N * 2^N)` | Exacto. Usa una máscara de bits para representar los clientes visitados y evita recalcular subproblemas. |
-| **3. MST + DFS (Prim)** | `O(N^2)` | `O(N)` | Aproximado (2-aproximación). Arma el árbol de expansión mínima con Prim y hace un recorrido DFS en preorden. |
-| **4. Nearest Neighbor** | `O(N^2)` | `O(N)` | Heurístico voraz. Desde el nodo actual siempre elige ir al nodo no visitado más cercano. |
+| **Grafo (Matriz de Adyacencia)** | Carga: `O(N^2)` / Consulta: `O(1)` | `O(N^2)` | Soporta métrica Euclidiana y Haversine sin tope fijo de `N`. |
+| **1. Backtracking (Branch & Bound)** | `O((N - 1)!)` | `O(N)` | **Óptimo exacto.** Usa cota superior voraz + cota inferior por aristas mínimas salientes (`N <= 12`). |
+| **2. Held-Karp (DP + Bitmask)** | `O(N^2 * 2^N)` | `O(N * 2^N)` | **Óptimo exacto.** Tablas lineales contiguas para subconjuntos de clientes (`N <= 20`). |
+| **3. MST + DFS (Prim)** | `O(N^2)` | `O(N)` | **2-Aproximación** garantizada en grafos métricos (`Costo <= 2 * OPT`). Escalable a `N >= 200`. |
+| **4. Nearest Neighbor** | `O(N^2)` | `O(N)` | **Heurística voraz** ultrarrápida para despacho en tiempo real (`N >= 200`). |
 
-## Estructura del proyecto
+## Modelo de Costo Operativo (USD)
 
-* `Graph.h` / `Graph.cpp`: Clase `Graph` con matriz de adyacencia y carga de datos de prueba simulando lectura de archivo con `stringstream`.
-* `Algorithms.h` / `Algorithms.cpp`: Implementación de los 4 algoritmos solicitados y la clase `Profiler` con `<chrono>`.
-* `main.cpp`: Caso de prueba piloto con $N = 10$ nodos que compara costos, diferencia porcentual y tiempos de ejecución.
+Para cada tramo $(i \to j)$ de distancia $d_{ij}$ (km):
+
+$$\text{Costo\_Ruta}(i \to j) = d_{ij} \cdot \frac{P_c}{R} + C_o \cdot \frac{d_{ij}}{V_{\text{prom}}} + C_p$$
+
+donde $P_c = 1.25\text{ USD/L}$, $R = 10\text{ km/L}$, $V_{\text{prom}} = 30\text{ km/h}$, $C_o = 8.0\text{ USD/h}$, y $C_p = 2.5\text{ USD}$ por parada en cliente ($C_p = 0$ al retornar al almacén central `j = 0`).
