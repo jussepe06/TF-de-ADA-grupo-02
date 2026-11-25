@@ -1,0 +1,9 @@
+*.exe
+*.o
+*.out
+compile_commands.json
+compile_flags.txt
+GUIA_ESTUDIO_Y_EXPOSICION.md
+.vscode/
+__pycache__/
+

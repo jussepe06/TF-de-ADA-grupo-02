@@ -1,6 +1,7 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+#include <cstdint>
 #include <istream>
 #include <string>
 #include <vector>
@@ -24,6 +25,18 @@ struct ParametrosCosto {
     double costoParadaCliente = 2.5; // Cp: costo fijo de entrega por cliente (USD; 0 si j == 0)
 };
 
+// Desglose explicativo del costo operativo logistico de una ruta (facilita interpretacion en USD)
+struct DesgloseCostoRuta {
+    double distanciaTotalKm = 0.0;
+    double tiempoConduccionHoras = 0.0;
+    double litrosCombustible = 0.0;
+    double costoCombustibleUSD = 0.0;
+    double costoChoferUSD = 0.0;
+    double costoParadasUSD = 0.0;
+    double costoTotalUSD = 0.0;
+    int clientesVisitados = 0;
+};
+
 enum class TipoMetrica {
     EUCLIDIANA,
     HAVERSINE,
@@ -42,7 +55,19 @@ struct ValidacionGrafo {
     bool dimensionesValidas = true;
     bool idsValidos = true;
     bool coordsValidas = true;
+    bool tieneAlmacenCentral = true;
     bool cumpleDesigualdadTriangular = true;
+
+    // Contadores y estadisticas descriptivas de la red para diagnostico claro
+    int paresCoincidentes = 0;
+    int violacionesTriangulares = 0;
+    uint64_t ternasEvaluadas = 0;
+    double peorExcesoTriangularKm = 0.0;
+    double distanciaMinKm = 0.0;
+    double distanciaMaxKm = 0.0;
+    double distanciaPromedioKm = 0.0;
+    double radioMaxAlmacenKm = 0.0;
+
     vector<string> errores;
     vector<string> advertencias;
 };
@@ -83,10 +108,11 @@ public:
     bool removeNode(int id);
     void rebuildDistanceMatrix();
 
-    // Calculos de costo operativo y distancia (RF06)
+    // Calculos de costo operativo y desglose explicativo (RF06)
     double calcularCostoTramoUSD(int u, int v) const;
     double calcularCostoRutaUSD(const vector<int>& ruta) const;
     double calcularDistanciaRutaKm(const vector<int>& ruta) const;
+    DesgloseCostoRuta desglosarCostoRuta(const vector<int>& ruta) const;
 
     // Validacion estructural robusta y diagnostico de propiedades metricas
     ValidacionGrafo validateGraphDetailed(bool verificarDesigualdadTriangular = false) const;

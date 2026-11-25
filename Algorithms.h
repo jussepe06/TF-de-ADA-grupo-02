@@ -21,11 +21,11 @@ enum class TipoSolucion {
 enum class TipoReferencia {
     OPTIMO_EXACTO,    // Desviacion porcentual respecto al optimo matematico comprobado
     MEJOR_OBSERVADO,  // Diferencia porcentual respecto a la mejor heuristica ejecutada (NO es error sobre optimo)
-    COTA_INFERIOR,    // Diferencia respecto a una cota teorica inferior (ej. peso del MST)
+    COTA_INFERIOR,    // Diferencia respecto a una cota teorica inferior (ej. peso del MST <= OPT)
     SIN_REFERENCIA    // Sin base valida de comparacion (N/A)
 };
 
-// Estructura completa de metricas de instrumentacion y auditoria (RF07, RF13)
+// Estructura completa de metricas experimentales e interpretacion operativa (RF07, RF13)
 struct TSPResult {
     string algoritmo;
     TipoSolucion tipo_solucion = TipoSolucion::HEURISTICA;
@@ -34,28 +34,31 @@ struct TSPResult {
     double distancia_km = 0.0;
     double costo_usd = 0.0;
 
-    // Referencia y desviacion porcentual
+    // Referencia y metricas de calidad entendibles
     TipoReferencia tipo_referencia = TipoReferencia::SIN_REFERENCIA;
     string tipo_referencia_str = "Sin Referencia";
-    double desviacion_pct = -1.0;
+    double desviacion_pct = -1.0;              // >= 0 solo cuando se conoce el Optimo Exacto
     bool desviacion_valida = false;
-    double diferencia_mejor_observada_pct = 0.0;
-    double diferencia_cota_inferior_pct = 0.0;
-    double cota_inferior_mst_km = 0.0;
+    double diferencia_mejor_observada_pct = 0.0; // Diferencia % frente al mejor algoritmo corrido
+    double diferencia_cota_inferior_pct = 0.0;   // Brecha maxima teorica % frente al peso del MST
+    double cota_inferior_mst_km = 0.0;           // W(MST) <= OPT en grafos metricos
+    double sobrecosto_usd_vs_mejor = 0.0;        // Dolares extra frente a la mejor ruta hallada
 
     // Tiempos medidos con std::chrono::steady_clock
     double tiempo_us = 0.0;
     double tiempo_ms = 0.0;
+    double speedup_vs_mas_lento = 1.0;           // Cuantas veces mas rapido es frente al mas lento
 
-    // Metricas de memoria
-    double memoria_auxiliar_kb = 0.0;
-    double memoria_proceso_kb = 0.0;
+    // Metricas de memoria separadas para facil lectura
+    double memoria_auxiliar_kb = 0.0;            // Memoria propia pedida por las estructuras del algoritmo
+    double memoria_proceso_kb = 0.0;             // Huella total del proceso en el Sistema Operativo
     double memoria_kb = 0.0;
 
-    // Contadores especificos por estrategia
+    // Contadores especificos por estrategia y efectividad de poda
     uint64_t operaciones_o_estados = 0;
     uint64_t estados_explorados = 0;   // Backtracking
     uint64_t estados_podados = 0;      // Backtracking
+    double tasa_poda_pct = 0.0;        // % de decisiones podadas en Backtracking
     uint64_t transiciones_dp = 0;      // Held-Karp
     uint64_t comparaciones_prim = 0;   // MST Prim
     uint64_t visitas_dfs = 0;          // Recorrido DFS
@@ -83,24 +86,39 @@ enum class CriterioPrioridad {
 // Estructura de configuracion para el motor de adaptabilidad (RF11)
 struct ConfiguracionAdaptativa {
     double memoriaMaximaMB = 512.0;
-    double tiempoMaximoSegundos = 30.0;
+    double tiempoMaximoMs = 5000.0;
     int maxSafeBacktracking = 12;
     int maxSafeHeldKarp = 20;
     CriterioPrioridad criterio = CriterioPrioridad::BALANCEADO;
     bool exigirGarantiaTeorica = false;
 };
 
+// Fila de la matriz de evaluacion del Recomendador Adaptativo (explica por que elige o descarta)
+struct EvaluacionCandidato {
+    string algoritmo;
+    string complejidad;
+    double memoriaEstimadaKB = 0.0;
+    string garantiaCalidad;
+    bool viable = false;
+    bool seleccionado = false;
+    string razonDecision;
+};
+
 // Resultado enriquecido para el Recomendador Adaptativo (RF11)
 struct RecomendacionAdaptativa {
     string algoritmoElegido;
     string categoriaEscala;
+    bool instanciaValida = true;
     bool cumpleDesigualdadTriangular = false;
+    bool huboDegradacionPorRecursos = false;
     string justificacion;
+    ValidacionGrafo diagnosticoInstancia;
+    vector<EvaluacionCandidato> evaluacionCandidatos;
     TSPResult resultado;
     ConfiguracionAdaptativa configUtilizada;
 };
 
-// Medidor de tiempo de alta resolucion y memoria del proceso (RF07, RF13)
+// Medidor de tiempo monotono y memoria del proceso (RF07, RF13)
 class Profiler {
 private:
     chrono::steady_clock::time_point startTime;
@@ -119,7 +137,6 @@ public:
         return elapsedMicroseconds() / 1000.0;
     }
 
-    // Consulta la memoria del proceso actual en Windows/Linux (KB)
     static double obtenerMemoriaProcesoKB();
 };
 
@@ -148,15 +165,21 @@ public:
     static constexpr int kMaxSafeBacktracking = 12;
     static constexpr int kMaxSafeHeldKarp = 20;
 
-    // Funcion comun de validacion rigurosa de ciclo TSP (Seccion 4.5)
+    // Estima en KB la memoria auxiliar de Held-Karp antes de reservarla
+    static double estimarMemoriaHeldKarpKB(int n);
+
+    // Calcula unicamente el peso del Arbol de Expansion Minima W(MST) <= OPT en O(N^2)
+    static double calcularCotaInferiorMST(const Graph& graph);
+
+    // Funcion comun de validacion rigurosa de ciclo TSP
     static bool validarRuta(const Graph& graph,
                             const vector<int>& ruta,
                             double costoReportadoKm,
                             string& mensajeError);
 
-    // Calculo y clasificacion rigurosa de desviacion porcentual (Seccion 5)
+    // Calculo y clasificacion entendible de desviacion porcentual, ahorros USD y speedup
     static void clasificarYCalcularDesviaciones(vector<TSPResult>& resultados,
-                                               double cotaInferiorConocida = 0.0);
+                                                double cotaInferiorConocida = 0.0);
 
     // Algoritmos principales
     static TSPResult Backtracking(const Graph& graph, int maxSafeN = kMaxSafeBacktracking);
@@ -166,11 +189,10 @@ public:
     static TSPResult MST_DFS(const Graph& graph);
     static TSPResult NearestNeighbor(const Graph& graph, int startNode = 0);
 
-    // Seleccion adaptativa automatica con configuracion de recursos (RF11)
+    // Seleccion adaptativa automatica con validacion previa y matriz de candidatos (RF11)
     static RecomendacionAdaptativa SeleccionAdaptativa(const Graph& graph,
                                                        const ConfiguracionAdaptativa& config);
 
-    // Sobrecarga de conveniencia compatible con versiones anteriores
     static RecomendacionAdaptativa SeleccionAdaptativa(const Graph& graph,
                                                        bool exigirGarantiaTeorica = false);
 };
