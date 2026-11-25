@@ -1,0 +1,33 @@
+Escenario,N,Algoritmo,Tipo_Solucion,Distancia_km,Costo_USD,Tipo_Referencia,Desviacion_pct,Tiempo_ms,Tiempo_Min_ms,Tiempo_Max_ms,Memoria_KB,Memoria_Aux_KB,Memoria_Proceso_KB,Operaciones_Estados,Ruta_Valida,Repeticiones
+Pequeno_8,8,Backtracking (B&B),Optima Exacta,215.6308,101.9554,Optimo Exacto,0.0000,0.045033,0.040800,0.051500,28.00,0.63,6232.00,752,SI,3
+Pequeno_8,8,Held-Karp (DP),Optima Exacta,215.6308,101.9554,Optimo Exacto,0.0000,0.041733,0.035800,0.047400,12.04,12.04,6248.00,1358,SI,3
+Pequeno_8,8,MST + DFS (Prim),2-Aproximacion (Garantia Teórica Costo <= 2*OPT),253.2356,116.6839,Optimo Exacto,17.4394,0.011900,0.005300,0.024600,0.37,0.37,6260.00,150,SI,3
+Pequeno_8,8,Nearest Neighbor,Heuristica Voraz,225.7536,105.9202,Optimo Exacto,4.6945,0.001900,0.001700,0.002200,0.04,0.04,6260.00,56,SI,3
+Pequeno_10,10,Backtracking (B&B),Optima Exacta,259.7855,124.2493,Optimo Exacto,0.0000,0.074867,0.074400,0.075400,0.79,0.79,6296.00,1561,SI,3
+Pequeno_10,10,Held-Karp (DP),Optima Exacta,259.7855,124.2493,Optimo Exacto,0.0000,0.236733,0.231800,0.239400,60.04,60.04,6340.00,9234,SI,3
+Pequeno_10,10,MST + DFS (Prim),2-Aproximacion (Garantia Teórica Costo <= 2*OPT),360.5129,163.7009,Optimo Exacto,38.7733,0.011667,0.007300,0.017000,0.46,0.46,6284.00,228,SI,3
+Pequeno_10,10,Nearest Neighbor,Heuristica Voraz,279.4164,131.9381,Optimo Exacto,7.5566,0.002533,0.002400,0.002700,0.05,0.05,6284.00,90,SI,3
+Mediano_12,12,Backtracking (B&B),Optima Exacta,302.6525,146.0389,Optimo Exacto,0.0000,2.599267,2.519800,2.755500,0.95,0.95,6284.00,54867,SI,3
+Mediano_12,12,Held-Karp (DP),Optima Exacta,302.6525,146.0389,Optimo Exacto,0.0000,1.369200,1.366300,1.372500,288.05,288.05,6572.00,56342,SI,3
+Mediano_12,12,MST + DFS (Prim),2-Aproximacion (Garantia Teórica Costo <= 2*OPT),413.7897,189.5676,Optimo Exacto,36.7210,0.011067,0.009000,0.012500,0.56,0.56,6284.00,322,SI,3
+Mediano_12,12,Nearest Neighbor,Heuristica Voraz,325.1602,154.8544,Optimo Exacto,7.4368,0.003867,0.003400,0.004500,0.06,0.06,6284.00,132,SI,3
+Mediano_15,15,Held-Karp (DP),Optima Exacta,338.9984,167.7744,Optimo Exacto,0.0000,15.617467,15.500600,15.695600,2892.00,2880.06,9176.00,745500,SI,3
+Mediano_15,15,MST + DFS (Prim),2-Aproximacion (Garantia Teórica Costo <= 2*OPT),402.4967,192.6445,Optimo Exacto,18.7312,0.013533,0.011600,0.014800,0.70,0.70,7252.00,493,SI,3
+Mediano_15,15,Nearest Neighbor,Heuristica Voraz,354.4417,173.8230,Optimo Exacto,4.5556,0.004567,0.004200,0.004800,0.07,0.07,7252.00,210,SI,3
+Mediano_18,18,Held-Karp (DP),Optima Exacta,360.1131,183.5443,Optimo Exacto,0.0000,174.202900,170.936600,176.122100,27656.00,27648.07,34908.00,8912930,SI,3
+Mediano_18,18,MST + DFS (Prim),2-Aproximacion (Garantia Teórica Costo <= 2*OPT),436.2100,213.3489,Optimo Exacto,21.1314,0.018000,0.015500,0.019500,0.84,0.84,7252.00,700,SI,3
+Mediano_18,18,Nearest Neighbor,Heuristica Voraz,445.4267,216.9588,Optimo Exacto,23.6908,0.005933,0.005600,0.006200,0.08,0.08,7252.00,306,SI,3
+Mediano_20,20,Held-Karp (DP),Optima Exacta,368.1910,191.7082,Optimo Exacto,0.0000,828.802900,821.586700,832.625300,122888.00,122880.08,130144.00,44826662,SI,3
+Mediano_20,20,MST + DFS (Prim),2-Aproximacion (Garantia Teórica Costo <= 2*OPT),470.3696,231.7281,Optimo Exacto,27.7515,0.021900,0.017600,0.024900,0.93,0.93,7256.00,858,SI,3
+Mediano_20,20,Nearest Neighbor,Heuristica Voraz,463.6934,229.1132,Optimo Exacto,25.9383,0.006933,0.006400,0.007400,0.09,0.09,7256.00,380,SI,3
+Grande_30,30,MST + DFS (Prim),2-Aproximacion (Garantia Teórica Costo <= 2*OPT),569.0523,295.3788,Mejor Observado,-1.0000,0.043700,0.034600,0.059000,1.40,1.40,7256.00,1888,SI,3
+Grande_30,30,Nearest Neighbor,Heuristica Voraz,537.8787,283.1692,Mejor Observado,-1.0000,0.018433,0.015000,0.021000,0.13,0.13,7256.00,870,SI,3
+Grande_50,50,MST + DFS (Prim),2-Aproximacion (Garantia Teórica Costo <= 2*OPT),759.6099,420.0139,Mejor Observado,-1.0000,0.135867,0.133000,0.138600,2.34,2.34,7256.00,5148,SI,3
+Grande_50,50,Nearest Neighbor,Heuristica Voraz,669.1549,384.5857,Mejor Observado,-1.0000,0.056233,0.053400,0.057800,0.21,0.21,6296.00,2450,SI,3
+Grande_100,100,MST + DFS (Prim),2-Aproximacion (Garantia Teórica Costo <= 2*OPT),963.3887,624.8273,Mejor Observado,-1.0000,0.332067,0.307500,0.376500,4.68,4.68,6300.00,20298,SI,3
+Grande_100,100,Nearest Neighbor,Heuristica Voraz,897.7532,599.1200,Mejor Observado,-1.0000,0.133967,0.132000,0.136600,0.41,0.41,6300.00,9900,SI,3
+Grande_200,200,MST + DFS (Prim),2-Aproximacion (Garantia Teórica Costo <= 2*OPT),1336.5105,1020.9666,Mejor Observado,-1.0000,1.226533,1.134400,1.383800,64.00,9.37,6380.00,80598,SI,3
+Grande_200,200,Nearest Neighbor,Heuristica Voraz,1170.6021,955.9858,Mejor Observado,-1.0000,0.527467,0.516900,0.539500,0.81,0.81,6380.00,39800,SI,3
+Lima_Real,16,Held-Karp (DP),Optima Exacta,98.6553,76.1400,Optimo Exacto,0.0000,36.288167,35.640500,36.721700,6152.00,6144.07,12532.00,1720350,SI,3
+Lima_Real,16,MST + DFS (Prim),2-Aproximacion (Garantia Teórica Costo <= 2*OPT),128.6640,87.8934,Optimo Exacto,30.4178,0.023200,0.017000,0.027000,0.75,0.75,6380.00,558,SI,3
+Lima_Real,16,Nearest Neighbor,Heuristica Voraz,127.7987,87.5545,Optimo Exacto,29.5406,0.006967,0.005000,0.008200,0.07,0.07,6380.00,240,SI,3
